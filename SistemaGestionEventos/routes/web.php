@@ -14,4 +14,9 @@ Route::get('/inicio', function () {
     return view('inicio');
 })->name('home');
 
+Route::get('/participantes', function () {
+    return view('participantes.participante');
+})->name('home');
+
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
