@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+
+class RegisterController extends Controller
+{
+    // Redirigir a /dashboard después de registrar
+    protected $redirectTo = '/dashboard';
+
+    // Constructor
+    public function __construct()
+    {
+        $this->middleware('guest');
+    }
+
+    // Mostrar el formulario de registro
+    public function showRegistrationForm()
+    {
+        return view('auth.register');
+    }
+
+    // Manejar el registro de usuarios
+    public function register(Request $request)
+    {
+        // Validar la solicitud
+        $this->validator($request->all())->validate();
+
+        // Crear el usuario
+        $user = $this->create($request->all());
+
+        // Iniciar sesión del usuario
+        Auth::login($user);
+
+        // Redirigir a la página de dashboard
+        return redirect($this->redirectTo);
+    }
+
+    // Validar los datos del usuario
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+    }
+
+    // Crear un nuevo usuario después de un registro válido
+    protected function create(array $data)
+    {
+        return User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+        ]);
+    }
+}
